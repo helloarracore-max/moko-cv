@@ -29,16 +29,38 @@ function AvailableBadge() {
   );
 }
 
-function IconBtn({ size = "sm" }: { size?: "sm" | "md" }) {
+function IconBtn({
+  size = "sm",
+  onClick,
+  ariaLabel = "Open details",
+}: {
+  size?: "sm" | "md";
+  onClick?: () => void;
+  ariaLabel?: string;
+}) {
+  if (!onClick) {
+    return (
+      <span
+        aria-hidden="true"
+        className={`inline-flex items-center justify-center rounded-none border border-stone-300 dark:border-white/20 bg-stone-200/50 dark:bg-white/5 text-stone-700 dark:text-stone-300 ${
+          size === "md" ? "h-12 w-12" : "h-8 w-8"
+        }`}
+      >
+        <ArrowUpRight size={size === "md" ? 20 : 16} weight="bold" aria-hidden="true" />
+      </span>
+    );
+  }
   return (
     <Button
+      aria-label={ariaLabel}
       variant="outline"
       size="icon"
+      onClick={onClick}
       className={`rounded-none border-stone-300 dark:border-white/20 bg-stone-200/50 dark:bg-white/5 hover:bg-stone-300 dark:hover:bg-white/10 text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-white transition-all ${
         size === "md" ? "h-12 w-12" : "h-8 w-8"
       }`}
     >
-      <ArrowUpRight size={size === "md" ? 20 : 16} weight="bold" />
+      <ArrowUpRight size={size === "md" ? 20 : 16} weight="bold" aria-hidden="true" />
     </Button>
   );
 }
@@ -148,11 +170,12 @@ function ExperienceCard() {
             Experience
           </span>
           <Button
+            aria-label="Experience details"
             variant="ghost"
             size="icon"
             className="rounded-none hover:bg-stone-200 dark:hover:bg-white/10 text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-white h-8 w-8"
           >
-            <Briefcase size={16} weight="bold" />
+            <Briefcase size={16} weight="bold" aria-hidden="true" />
           </Button>
         </div>
         <div>
@@ -308,8 +331,15 @@ function SoftSkillsCard() {
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 
+const NAV_LINKS = [
+  { label: "Home", href: "#home" },
+  { label: "Experience", href: "#experience" },
+  { label: "Skills", href: "#skills" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
+];
+
 function Nav({ isDark, toggleDark }: { isDark: boolean; toggleDark: () => void }) {
-  const links = ["Home", "Experience", "Skills", "About", "Contact"];
   return (
     <header className="bg-transparent border-b border-stone-300 dark:border-white/10">
       <nav className="flex max-w-7xl lg:px-8 mx-auto px-4 py-6 items-center justify-between">
@@ -320,25 +350,26 @@ function Nav({ isDark, toggleDark }: { isDark: boolean; toggleDark: () => void }
         </div>
 
         <ul className="hidden lg:flex lg:flex-row gap-8 items-center">
-          {links.map((l) => (
-            <li key={l}>
+          {NAV_LINKS.map((l) => (
+            <li key={l.label}>
               <a
-                href="#"
+                href={l.href}
                 className="hover:text-olive-600 dark:hover:text-olive-400 transition-colors duration-200 text-xs font-bold uppercase tracking-widest text-stone-500 dark:text-white/60 hover:underline underline-offset-4"
               >
-                {l}
+                {l.label}
               </a>
             </li>
           ))}
         </ul>
 
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <Button
+          aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          variant="outline"
+          size="icon"
           onClick={toggleDark}
           className="rounded-none border-stone-300 dark:border-white/20 bg-transparent hover:bg-stone-200 dark:hover:bg-white/10 text-stone-900 dark:text-white transition-all"
         >
-          {isDark ? <Sun size={18} weight="bold" /> : <Moon size={18} weight="bold" />}
+          {isDark ? <Sun size={18} weight="bold" aria-hidden="true" /> : <Moon size={18} weight="bold" aria-hidden="true" />}
         </Button>
       </nav>
     </header>
@@ -398,17 +429,17 @@ export function App() {
     <div className={`min-h-full antialiased font-sans selection:bg-olive-500 selection:text-white transition-colors duration-300 ${isDark ? 'bg-stone-900 text-stone-300' : 'bg-[#e4e4e0] text-stone-800'}`}>
       <Nav isDark={isDark} toggleDark={() => setIsDark(!isDark)} />
 
-      <main className="max-w-7xl lg:px-8 mx-auto px-4 pb-12 pt-8">
+      <main id="home" className="max-w-7xl lg:px-8 mx-auto px-4 pb-12 pt-8">
         <section className="bg-transparent">
           <div className="grid grid-cols-1 auto-rows-auto gap-6 md:auto-rows-[320px] lg:auto-rows-[400px] md:grid-cols-3">
             {/* Row 1-2 | col 1-2 */}
             <HeroCard />
             {/* Row 1 | col 3 */}
-            <SkillsCard />
+            <div id="skills"><SkillsCard /></div>
             {/* Row 2 | col 3 */}
-            <SabbaticalCard />
+            <div id="about"><SabbaticalCard /></div>
             {/* Row 3 | col 1 */}
-            <ExperienceCard />
+            <div id="experience"><ExperienceCard /></div>
             {/* Row 3 | col 2 */}
             <ImpactCard />
             {/* Row 3 | col 3 */}
@@ -421,7 +452,7 @@ export function App() {
         </section>
       </main>
       
-      <Footer />
+      <div id="contact"><Footer /></div>
     </div>
   );
 }
